@@ -1,6 +1,6 @@
-# IMPOSTER
+# WHO IS SUS?
 
-IMPOSTER is a pass-the-phone party game. Most players receive the same secret word. Imposters only receive the category and must bluff their way through discussion and voting.
+WHO IS SUS? is a pass-the-phone party game. Most players receive the same secret word. Imposters only receive the category and must bluff their way through discussion and voting.
 
 ## Features
 

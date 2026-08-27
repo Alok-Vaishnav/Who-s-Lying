@@ -79,7 +79,7 @@ export function PlayerSetup({
       <button
         type="button"
         onClick={onSettings}
-        className="mt-4 w-full text-sm font-semibold text-slate-400 transition hover:text-white"
+        className="mt-auto w-full pt-6 text-sm font-semibold text-slate-400 transition hover:text-white"
       >
         Game Settings
       </button>
