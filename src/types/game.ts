@@ -1,4 +1,4 @@
-export type CategoryName = 'Sport' | 'Music' | 'Book' | 'Movie' | 'Country' | 'Famous People';
+export type CategoryName = 'Sport' | 'Singer' | 'Music' | 'Book' | 'Movie' | 'Country' | 'Famous People';
 export type CategorySelection = CategoryName[] | 'Random';
 export type Role = 'imposter' | 'innocent';
 export type GamePhase = 'home' | 'setup' | 'settings' | 'reveal' | 'discussion' | 'voting' | 'result';
