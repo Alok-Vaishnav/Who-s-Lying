@@ -1,7 +1,7 @@
-export type CategoryName = 'Sport' | 'Singer' | 'Music' | 'Book' | 'Movie' | 'Country' | 'Famous People';
+export type CategoryName = 'Sport' | 'Singer' | 'Music' | 'Book' | 'Movie' | 'Country' | 'Famous People' | 'Meme and Dialog';
 export type CategorySelection = CategoryName[] | 'Random';
 export type Role = 'imposter' | 'innocent';
-export type GamePhase = 'home' | 'setup' | 'settings' | 'reveal' | 'discussion' | 'voting' | 'result';
+export type GamePhase = 'home' | 'setup' | 'settings' | 'reveal' | 'roleGuide' | 'discussion' | 'voting' | 'result';
 export type Winner = 'innocents' | 'imposters';
 
 export interface Player {
@@ -14,6 +14,8 @@ export interface Player {
 export interface Settings {
   imposters: number;
   category: CategorySelection;
+  roleGuideEnabled: boolean;
+  roleGuideSeconds: number;
 }
 
 export interface GameState {

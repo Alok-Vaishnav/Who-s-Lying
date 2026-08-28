@@ -5,8 +5,12 @@ import type { CategorySelection } from '../types/game';
 interface SettingsProps {
   imposters: number;
   category: CategorySelection;
+  roleGuideEnabled: boolean;
+  roleGuideSeconds: number;
   onSetImposters: (value: number) => void;
   onSetCategory: (value: CategorySelection) => void;
+  onSetRoleGuideEnabled: (value: boolean) => void;
+  onSetRoleGuideSeconds: (value: number) => void;
   onBack: () => void;
   onSave: () => void;
   maxImposters: number;
@@ -15,8 +19,12 @@ interface SettingsProps {
 export function SettingsScreen({
   imposters,
   category,
+  roleGuideEnabled,
+  roleGuideSeconds,
   onSetImposters,
   onSetCategory,
+  onSetRoleGuideEnabled,
+  onSetRoleGuideSeconds,
   onBack,
   onSave,
   maxImposters,
@@ -82,6 +90,37 @@ export function SettingsScreen({
               </button>
             ))}
           </div>
+        </section>
+
+        <section className="rounded-3xl border border-slate-700 bg-slate-900/80 p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Role guide timer</p>
+              <p className="mt-1 text-xs text-slate-500">Show player names and role guidance after all reveals.</p>
+            </div>
+            <input
+              type="checkbox"
+              aria-label="Enable role guide timer"
+              checked={roleGuideEnabled}
+              onChange={(event) => onSetRoleGuideEnabled(event.target.checked)}
+              className="h-5 w-5 accent-rose-400"
+            />
+          </div>
+          {roleGuideEnabled ? (
+            <div className="mt-4 flex items-center gap-3">
+              <label htmlFor="role-guide-seconds" className="text-sm text-slate-300">Seconds</label>
+              <input
+                id="role-guide-seconds"
+                type="number"
+                min="5"
+                max="60"
+                value={roleGuideSeconds}
+                onChange={(event) => onSetRoleGuideSeconds(Number(event.target.value))}
+                className="w-24 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-white focus:border-rose-400 focus:outline-none"
+              />
+              <span className="text-xs text-slate-500">5–60</span>
+            </div>
+          ) : null}
         </section>
 
       </div>

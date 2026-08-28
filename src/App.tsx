@@ -5,10 +5,12 @@ import { Home } from './screens/Home';
 import { PlayerSetup } from './screens/PlayerSetup';
 import { ResultScreen } from './screens/Result';
 import { RoleRevealScreen } from './screens/RoleReveal';
+import { RoleGuideScreen } from './screens/RoleGuide';
 import { SettingsScreen } from './screens/Settings';
 import { VotingScreen } from './screens/Voting';
 import type { CategorySelection, GamePhase, GameState, Player, Role, Settings } from './types/game';
 import { getMaxImposters, validatePlayerNames, createNewRound, checkWinCondition } from './utils/gameLogic';
+import { shuffleArray } from './utils/random';
 
 const STORAGE_KEYS = {
   players: 'imposter-player-names',
@@ -20,6 +22,8 @@ const defaultPlayers = ['Player 1', 'Player 2', 'Player 3'];
 const defaultSettings: Settings = {
   imposters: 1,
   category: 'Random',
+  roleGuideEnabled: true,
+  roleGuideSeconds: 20,
 };
 
 function loadStoredPlayers(): string[] {
@@ -75,12 +79,19 @@ function getRemainingAllowedInnocentEliminations(players: Player[]): number {
   return Math.max(0, totalImposters - 1 - eliminatedInnocents);
 }
 
+function clampRoleGuideSeconds(value: number): number {
+  return Math.min(Math.max(5, Math.round(value)), 60);
+}
+
 function App() {
   const [screen, setScreen] = useState<GamePhase>('home');
   const [players, setPlayers] = useState<string[]>(() => loadStoredPlayers());
   const [settings, setSettings] = useState<Settings>(() => loadStoredSettings());
   const [game, setGame] = useState<GameState | null>(null);
   const [revealVisible, setRevealVisible] = useState(false);
+  const [roleGuideSecondsRemaining, setRoleGuideSecondsRemaining] = useState(20);
+  const [roleGuidePlayers, setRoleGuidePlayers] = useState<Player[]>([]);
+  const [roleGuideIndex, setRoleGuideIndex] = useState(0);
   const [selectedVoteId, setSelectedVoteId] = useState<string | null>(null);
   const [pendingElimination, setPendingElimination] = useState<{ name: string; role: Role } | null>(null);
 
@@ -128,6 +139,21 @@ function App() {
     setSettings((currentSettings) => ({ ...currentSettings, category: value }));
   }
 
+  function handleSettingsRoleGuideEnabled(value: boolean) {
+    setSettings((currentSettings) => ({ ...currentSettings, roleGuideEnabled: value }));
+  }
+
+  function handleSettingsRoleGuideSeconds(value: number) {
+    if (!Number.isFinite(value)) {
+      return;
+    }
+
+    setSettings((currentSettings) => ({
+      ...currentSettings,
+      roleGuideSeconds: clampRoleGuideSeconds(value),
+    }));
+  }
+
   function handleStartGame() {
     setScreen('setup');
   }
@@ -146,6 +172,9 @@ function App() {
     setPendingElimination(null);
     setSelectedVoteId(null);
     setRevealVisible(false);
+    setRoleGuideSecondsRemaining(settings.roleGuideSeconds);
+    setRoleGuidePlayers([]);
+    setRoleGuideIndex(0);
   }
 
   function handleSetupContinue() {
@@ -170,6 +199,9 @@ function App() {
     const round = createNewRound(players, finalSettings);
     setGame(round);
     setRevealVisible(false);
+    setRoleGuideSecondsRemaining(finalSettings.roleGuideSeconds);
+    setRoleGuidePlayers([]);
+    setRoleGuideIndex(0);
     setPendingElimination(null);
     setSelectedVoteId(null);
     setScreen('reveal');
@@ -188,7 +220,14 @@ function App() {
 
     if (isLastPlayer) {
       setRevealVisible(false);
-      setScreen('discussion');
+      if (settings.roleGuideEnabled) {
+        setRoleGuidePlayers(shuffleArray(game.players));
+        setRoleGuideIndex(0);
+        setRoleGuideSecondsRemaining(settings.roleGuideSeconds);
+        setScreen('roleGuide');
+      } else {
+        setScreen('discussion');
+      }
       return;
     }
 
@@ -197,6 +236,41 @@ function App() {
     );
     setRevealVisible(false);
   }
+
+  function handleNextRoleGuidePlayer() {
+    if (roleGuideIndex >= roleGuidePlayers.length - 1) {
+      setScreen('discussion');
+      return;
+    }
+
+    setRoleGuideIndex((currentIndex) => currentIndex + 1);
+    setRoleGuideSecondsRemaining(settings.roleGuideSeconds);
+  }
+
+  useEffect(() => {
+    if (screen !== 'roleGuide' || !settings.roleGuideEnabled) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setRoleGuideSecondsRemaining((currentSeconds) => {
+        if (currentSeconds <= 1) {
+          window.clearInterval(timer);
+          if (roleGuideIndex >= roleGuidePlayers.length - 1) {
+            setScreen('discussion');
+          } else {
+            setRoleGuideIndex((currentIndex) => currentIndex + 1);
+            setRoleGuideSecondsRemaining(settings.roleGuideSeconds);
+          }
+          return 0;
+        }
+
+        return currentSeconds - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [screen, settings.roleGuideEnabled, roleGuidePlayers.length, roleGuideIndex, settings.roleGuideSeconds]);
 
   function handleStartVoting() {
     setScreen('voting');
@@ -269,9 +343,7 @@ function App() {
   }
 
   function handleExitGame() {
-    if (window.confirm('Exit this game? Your current round will be lost.')) {
-      handleBackHome();
-    }
+    handleBackHome();
   }
 
   if (screen === 'home') {
@@ -299,8 +371,12 @@ function App() {
       <SettingsScreen
         imposters={settings.imposters}
         category={settings.category}
+        roleGuideEnabled={settings.roleGuideEnabled}
+        roleGuideSeconds={settings.roleGuideSeconds}
         onSetImposters={handleSettingsImposters}
         onSetCategory={handleSettingsCategory}
+        onSetRoleGuideEnabled={handleSettingsRoleGuideEnabled}
+        onSetRoleGuideSeconds={handleSettingsRoleGuideSeconds}
         onBack={handleBackToSetup}
         onSave={handleSaveSettings}
         maxImposters={maxImposters}
@@ -332,6 +408,25 @@ function App() {
     return (
       <DiscussionScreen
         onStartVoting={handleStartVoting}
+        onExit={handleExitGame}
+      />
+    );
+  }
+
+  if (screen === 'roleGuide' && game) {
+    const currentRoleGuidePlayer = roleGuidePlayers[roleGuideIndex];
+
+    if (!currentRoleGuidePlayer) {
+      return null;
+    }
+
+    return (
+      <RoleGuideScreen
+        player={currentRoleGuidePlayer}
+        playerNumber={roleGuideIndex + 1}
+        totalPlayers={roleGuidePlayers.length}
+        secondsRemaining={roleGuideSecondsRemaining}
+        onNext={handleNextRoleGuidePlayer}
         onExit={handleExitGame}
       />
     );
