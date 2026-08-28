@@ -1,11 +1,14 @@
 @import 'tailwindcss';
 
 :root {
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
   color: #e2e8f0;
   background:
-    radial-gradient(circle at top, rgba(244, 63, 94, 0.18), transparent 28%),
-    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    radial-gradient(circle at 50% -10%, rgba(244, 63, 94, 0.2), transparent 34%),
+    linear-gradient(135deg, rgba(30, 41, 59, 0.5) 1px, transparent 1px),
+    linear-gradient(45deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+    linear-gradient(180deg, #070a12 0%, #111827 100%);
+  background-size: auto, 28px 28px, 28px 28px, auto;
   color-scheme: dark;
   line-height: 1.5;
   font-weight: 400;
@@ -26,6 +29,11 @@ body {
   min-height: 100vh;
   background: transparent;
   touch-action: pan-x pan-y;
+}
+
+::selection {
+  color: #fff1f2;
+  background: #e11d48;
 }
 
 * {

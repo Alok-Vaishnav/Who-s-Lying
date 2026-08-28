@@ -43,10 +43,16 @@ export function getMaxImposters(playerCount: number): number {
 
 export function getCategoryForRound(categorySetting: CategorySelection): CategoryName {
   if (categorySetting === 'Random') {
-    return getRandomItem(Object.keys(CATEGORY_ITEMS) as CategoryName[]);
+    const availableCategories = (Object.keys(CATEGORY_ITEMS) as CategoryName[]).filter(
+      (category) => getCategoryItems(category).length > 0,
+    );
+
+    return getRandomItem(availableCategories);
   }
 
-  return getRandomItem(categorySetting);
+  const availableCategories = categorySetting.filter((category) => getCategoryItems(category).length > 0);
+
+  return getRandomItem(availableCategories.length ? availableCategories : ['Sport']);
 }
 
 export function createNewRound(playerNames: string[], settings: Settings): GameState {

@@ -21,9 +21,14 @@ export function DiscussionScreen({ onStartVoting, onExit }: DiscussionProps) {
             Start Voting
           </Button>
         </div>
-        <button type="button" onClick={onExit} className="mt-4 w-full text-sm font-semibold text-slate-400 transition hover:text-white">
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={onExit}
+          className="mt-4"
+        >
           Exit Game
-        </button>
+        </Button>
       </div>
     </div>
   );

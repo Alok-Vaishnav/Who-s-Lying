@@ -19,9 +19,11 @@ export function RoleRevealScreen({ player, category, secretWord, onReveal, onHid
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5 py-8">
       <div className="rounded-4xl border border-slate-700 bg-slate-900/85 p-6 shadow-2xl shadow-slate-950/50">
-        <p className="text-center text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
-          Pass the phone to
-        </p>
+        <div className="mb-7 flex items-center justify-between border-b border-slate-800 pb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-rose-300">Private reveal</p>
+          <p className="text-xs font-bold tabular-nums text-slate-500">{currentIndex + 1} / {totalPlayers}</p>
+        </div>
+        <p className="text-center text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Pass the phone to</p>
         <h2 className="mt-3 text-center text-3xl font-black text-white">{player?.name}</h2>
         <p className="mt-2 text-center text-sm text-slate-300">Only {player?.name} should look at the screen.</p>
 
@@ -44,7 +46,15 @@ export function RoleRevealScreen({ player, category, secretWord, onReveal, onHid
             </>
           ) : (
             <div className="space-y-4 py-3">
-              <div className="text-xl font-black text-white">{currentIndex + 1}/{totalPlayers}</div>
+              <div className="flex justify-center gap-2" aria-label={`Player ${currentIndex + 1} of ${totalPlayers}`}>
+                {Array.from({ length: totalPlayers }, (_, index) => (
+                  <span
+                    key={index}
+                    className={`h-1.5 rounded-full transition-all ${index === currentIndex ? 'w-8 bg-rose-400' : 'w-2 bg-slate-700'}`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Your role is waiting</p>
               <Button onClick={onReveal} fullWidth>
                 Tap to Reveal
               </Button>
@@ -60,9 +70,19 @@ export function RoleRevealScreen({ player, category, secretWord, onReveal, onHid
           </div>
         ) : null}
 
-        <button type="button" onClick={onExit} className="mt-4 w-full text-sm font-semibold text-slate-400 transition hover:text-white">
-          Exit Game
-        </button>
+        <div className="mt-10 border-t border-slate-800 pt-5">
+          <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-slate-600">
+            Round controls
+          </p>
+          <Button
+            variant="ghost"
+            fullWidth
+            onClick={onExit}
+            className="border-slate-700 text-sm text-slate-400 hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-rose-200"
+          >
+            Exit Game
+          </Button>
+        </div>
       </div>
     </div>
   );

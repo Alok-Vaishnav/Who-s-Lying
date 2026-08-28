@@ -268,6 +268,12 @@ function App() {
     setRevealVisible(false);
   }
 
+  function handleExitGame() {
+    if (window.confirm('Exit this game? Your current round will be lost.')) {
+      handleBackHome();
+    }
+  }
+
   if (screen === 'home') {
     return <Home onStart={handleStartGame} />;
   }
@@ -316,7 +322,7 @@ function App() {
           isVisible={revealVisible}
           totalPlayers={game.players.length}
           currentIndex={game.currentPlayerIndex}
-          onExit={handleBackHome}
+          onExit={handleExitGame}
         />
       </>
     );
@@ -326,7 +332,7 @@ function App() {
     return (
       <DiscussionScreen
         onStartVoting={handleStartVoting}
-        onExit={handleBackHome}
+        onExit={handleExitGame}
       />
     );
   }
@@ -340,7 +346,7 @@ function App() {
           onSelectPlayer={handleVoteSelection}
           onConfirmVote={handleConfirmVote}
           onCancelVote={() => setSelectedVoteId(null)}
-          onExit={handleBackHome}
+          onExit={handleExitGame}
         />
 
         {pendingElimination ? (

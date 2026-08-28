@@ -54,9 +54,14 @@ export function VotingScreen({ players, selectedPlayerId, onSelectPlayer, onConf
         </div>
       ) : null}
 
-      <button type="button" onClick={onExit} className="mt-6 w-full text-sm font-semibold text-slate-400 transition hover:text-white">
+      <Button
+        variant="primary"
+        fullWidth
+        onClick={onExit}
+        className="mt-6"
+      >
         Exit Game
-      </button>
+      </Button>
     </div>
   );
 }
